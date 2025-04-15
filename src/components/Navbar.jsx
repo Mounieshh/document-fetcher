@@ -2,15 +2,16 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Check localStorage for user on mount
-  useEffect(() => {
+  // Update user state from localStorage
+  const updateUser = () => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
@@ -20,8 +21,15 @@ export default function Navbar() {
         console.error('Invalid user data in localStorage');
         handleSignOut();
       }
+    } else {
+      setUser(null);
     }
-  }, []);
+  };
+
+  // Check localStorage on mount and pathname change
+  useEffect(() => {
+    updateUser();
+  }, [pathname]);
 
   // Toggle mobile menu
   const toggleMobileMenu = () => {
@@ -33,6 +41,7 @@ export default function Navbar() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    setIsMobileMenuOpen(false);
     router.push('/login');
   };
 
@@ -82,12 +91,19 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={handleSignOut}
-                className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
-              >
-                Logout
-              </button>
+              <>
+                <Link href="/post">
+                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                    Create Post
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
+                >
+                  Logout
+                </button>
+              </>
             )}
           </div>
 
@@ -103,7 +119,7 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6" fill="none" viewBox="0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -149,12 +165,19 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={handleSignOut}
-                className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
-              >
-                Logout
-              </button>
+              <>
+                <Link href="/post">
+                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
+                    Create Post
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
+                >
+                  Logout
+                </button>
+              </>
             )}
           </div>
         </div>

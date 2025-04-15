@@ -1,3 +1,5 @@
+//src/app/post/page.jsx
+
 "use client";
 
 import { useState } from 'react';

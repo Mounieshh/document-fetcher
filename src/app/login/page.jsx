@@ -1,3 +1,5 @@
+//src/app/login/page.jsx
+
 'use client';
 
 import Link from 'next/link';
@@ -33,12 +35,11 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Redirect based on role
-      if (data.user.role === 'user') {
-        router.push('/post');
-      } else if (data.user.role === 'admin') {
-        router.push('/admin');
-      }
+      // Redirect based on role and clear history
+      const targetPath = data.user.role === 'user' ? '/post' : '/admin';
+      window.history.replaceState(null, '', targetPath);
+      router.push(targetPath);
+      
     } catch (err) {
       setError(err.message);
     } finally {

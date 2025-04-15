@@ -1,3 +1,5 @@
+//src/app/admin/page.jsx
+
 'use client';
 
 import Link from 'next/link';
@@ -97,12 +99,11 @@ const AdminPage = () => {
               >
                 <h2 className="text-xl font-semibold text-white">{doc.title}</h2>
                 <p className="text-gray-400 mt-2">{doc.body}</p>
-                <p className="text-gray-500 mt-2">User ID: {doc.userId}</p>
                 {doc.doc_url && (
                   <a
                     href={doc.doc_url}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel=""
                     className="text-blue-400 hover:underline mt-4 inline-block"
                   >
                     View Document

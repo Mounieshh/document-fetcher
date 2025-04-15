@@ -1,3 +1,5 @@
+//src/app/admin/create/page.jsx
+
 'use client';
 
 import { useState } from 'react';
