@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 const AdminPage = () => {
@@ -66,7 +67,7 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-6">Admin Panel - Document Search</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Admin Panel - Document Search</h1>
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -88,7 +89,6 @@ const AdminPage = () => {
         ) : filteredDocs.length === 0 ? (
           <p className="text-white">No matching documents found.</p>
         ) : (
-          // Documents List in Cards
           <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
             {filteredDocs.map((doc, index) => (
               <div
@@ -98,9 +98,9 @@ const AdminPage = () => {
                 <h2 className="text-xl font-semibold text-white">{doc.title}</h2>
                 <p className="text-gray-400 mt-2">{doc.body}</p>
                 <p className="text-gray-500 mt-2">User ID: {doc.userId}</p>
-                {doc.docs && (
+                {doc.doc_url && (
                   <a
-                    href={doc.docs}
+                    href={doc.doc_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:underline mt-4 inline-block"

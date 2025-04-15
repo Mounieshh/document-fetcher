@@ -1,23 +1,39 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
-  // Simulate auth state (replace with real auth logic)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [role, setRole] = useState(null); // null, 'admin', or 'user'
+  const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+
+  // Check localStorage for user on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error('Invalid user data in localStorage');
+        handleSignOut();
+      }
+    }
+  }, []);
 
   // Toggle mobile menu
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Simulate logout (replace with real logout logic)
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setRole(null);
+  // Handle sign out
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    router.push('/login');
   };
 
   return (
@@ -27,13 +43,13 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/">
-              <span className="text-2xl font-bold text-blue-500">Logo</span>
+              <span className="text-2xl font-bold text-blue-500">HyperReady</span>
             </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:items-center sm:space-x-4">
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <Link href="/register">
                   <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
@@ -46,34 +62,32 @@ export default function Navbar() {
                   </span>
                 </Link>
               </>
-            ) : role === 'admin' ? (
+            ) : user.role === 'admin' ? (
               <>
-                <Link href="/dashboard">
+                <Link href="/admin/create">
+                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                    Create User
+                  </span>
+                </Link>
+                <Link href="/admin">
                   <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
                     Dashboard
                   </span>
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={handleSignOut}
                   className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/posts/create">
-                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
-                    Form
-                  </span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={handleSignOut}
+                className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
+              >
+                Logout
+              </button>
             )}
           </div>
 
@@ -102,7 +116,7 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="sm:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <Link href="/register">
                   <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
@@ -115,34 +129,32 @@ export default function Navbar() {
                   </span>
                 </Link>
               </>
-            ) : role === 'admin' ? (
+            ) : user.role === 'admin' ? (
               <>
-                <Link href="/dashboard">
+                <Link href="/admin/create">
+                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
+                    Create User
+                  </span>
+                </Link>
+                <Link href="/admin">
                   <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
                     Dashboard
                   </span>
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={handleSignOut}
                   className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/posts/create">
-                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
-                    Form
-                  </span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={handleSignOut}
+                className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
+              >
+                Logout
+              </button>
             )}
           </div>
         </div>
