@@ -27,23 +27,54 @@ export default function CreatePost() {
     formData.append('pdf', pdfFile);
 
     try {
-      const response = await fetch('/api/upload', {
+      const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
 
-      const result = await response.json();
+      const uploadResult = await uploadResponse.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResult.error || 'Upload failed');
       }
 
-      setPdfUrl(result.url);
+      const s3Url = uploadResult.url;
+
+      // Prepare data for backend API
+      const postData = {
+        title: heading,
+        body: body,
+        doc_url: s3Url,
+        date: date,
+      };
+
+      // Get token from localStorage
+      const token = localStorage.getItem('token'); // Adjust 'token' to match your storage key
+      if (!token) {
+        throw new Error('No token found in localStorage');
+      }
+
+      const apiResponse = await fetch('https://hyperready-backend.onrender.com/api/doc/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(postData),
+      });
+
+      const apiResult = await apiResponse.json();
+
+      if (!apiResponse.ok) {
+        throw new Error(apiResult.error || 'Backend post failed');
+      }
+
+      setPdfUrl(s3Url);
       setHeading('');
       setBody('');
       setPdfFile(null);
       setDate('');
-      alert(`PDF uploaded! Link: ${result.url}`);
+      alert(`PDF and post data uploaded! S3 Link: ${s3Url}`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -58,7 +89,7 @@ export default function CreatePost() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 mb-2" htmlFor="heading">
-              Heading
+              Title
             </label>
             <input
               type="text"
@@ -66,7 +97,7 @@ export default function CreatePost() {
               value={heading}
               onChange={(e) => setHeading(e.target.value)}
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter post heading"
+              placeholder="Enter post title"
               required
             />
           </div>
@@ -111,21 +142,21 @@ export default function CreatePost() {
             />
           </div>
           {error && (
-          <div className="mb-4 text-red-500 text-center">{error}</div>
-        )}
-        {pdfUrl && (
-          <div className="mb-4 text-green-500 text-center">
-            <p>PDF Uploaded Successfully!</p>
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              {pdfUrl}
-            </a>
-          </div>
-        )}
+            <div className="mb-4 text-red-500 text-center">{error}</div>
+          )}
+          {pdfUrl && (
+            <div className="mb-4 text-green-500 text-center">
+              <p>PDF and Post Uploaded Successfully!</p>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {pdfUrl}
+              </a>
+            </div>
+          )}
           <button
             type="submit"
             disabled={uploading}
