@@ -9,8 +9,8 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
-  // Check localStorage for user on mount
-  useEffect(() => {
+  // Sync user state with localStorage
+  const syncUser = () => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
@@ -20,7 +20,21 @@ export default function Navbar() {
         console.error('Invalid user data in localStorage');
         handleSignOut();
       }
+    } else {
+      setUser(null);
     }
+  };
+
+  // Check localStorage on mount and listen for changes
+  useEffect(() => {
+    syncUser();
+    const handleStorageChange = (e) => {
+      if (e.key === 'user' || e.key === 'token') {
+        syncUser();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Toggle mobile menu
@@ -64,14 +78,14 @@ export default function Navbar() {
               </>
             ) : user.role === 'admin' ? (
               <>
-                <Link href="/admin/create">
-                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
-                    Create User
-                  </span>
-                </Link>
                 <Link href="/admin">
                   <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
                     Dashboard
+                  </span>
+                </Link>
+                <Link href="/admin/create">
+                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                    Create User
                   </span>
                 </Link>
                 <button
@@ -82,12 +96,19 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={handleSignOut}
-                className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
-              >
-                Logout
-              </button>
+              <>
+                <Link href="/post">
+                  <span className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
+                    Posts
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition"
+                  >
+                    Logout
+                  </button>
+              </>
             )}
           </div>
 
@@ -131,14 +152,14 @@ export default function Navbar() {
               </>
             ) : user.role === 'admin' ? (
               <>
-                <Link href="/admin/create">
-                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
-                    Create User
-                  </span>
-                </Link>
                 <Link href="/admin">
                   <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
                     Dashboard
+                  </span>
+                </Link>
+                <Link href="/admin/create">
+                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
+                    Create User
                   </span>
                 </Link>
                 <button
@@ -149,12 +170,19 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={handleSignOut}
-                className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
-              >
-                Logout
-              </button>
+              <>
+                <Link href="/post">
+                  <span className="block text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition">
+                    Posts
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left text-gray-700 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-base font-medium transition"
+                  >
+                    Logout
+                  </button>
+              </>
             )}
           </div>
         </div>
