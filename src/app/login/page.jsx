@@ -34,18 +34,12 @@ export default function Login() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-<<<<<<< HEAD
 
       // Redirect based on role and clear history
       const targetPath = data.user.role === 'user' ? '/post' : '/admin';
       window.history.replaceState(null, '', targetPath);
       router.push(targetPath);
       
-=======
-      
-      // Redirect based on role
-      router.push(data.user.role === 'admin' ? '/admin' : '/post');
->>>>>>> d5ff4fd32c6e778724afe6b874dd1fb3446ecaa5
     } catch (err) {
       setError(err.message);
     } finally {
