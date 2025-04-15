@@ -3,25 +3,23 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { protectRoute } from '@/lib/protectRoute';
 
-const AdminPage = () => {
+export default function AdminPage() {
   const [docs, setDocs] = useState([]);
   const [filteredDocs, setFilteredDocs] = useState([]);
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const isAuthenticated = protectRoute({ requireAuth: true, allowedRoles: ['admin'] });
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const fetchDocs = async () => {
       setLoading(true);
       const token = localStorage.getItem('token');
-
-      if (!token) {
-        setError('No token found. Please login again.');
-        setLoading(false);
-        return;
-      }
 
       try {
         const response = await fetch('https://hyperready-backend.onrender.com/api/doc', {
@@ -48,7 +46,7 @@ const AdminPage = () => {
     };
 
     fetchDocs();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleSearch = (query) => {
     setSearch(query);
@@ -58,7 +56,7 @@ const AdminPage = () => {
       return (
         doc.title?.toLowerCase().includes(lowerQuery) ||
         doc.body?.toLowerCase().includes(lowerQuery) ||
-        doc.userId?.toLowerCase().includes(lowerQuery) ||
+        doc.userId?.toString().includes(lowerQuery) ||
         doc.date?.toLowerCase().includes(lowerQuery)
       );
     });
@@ -66,10 +64,19 @@ const AdminPage = () => {
     setFilteredDocs(results);
   };
 
+  if (!isAuthenticated) {
+    return null; // Render nothing while redirecting
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-4">Admin Panel - Document Search</h1>
+        <Link href="/admin/create">
+          <button className="mb-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+            Create New User
+          </button>
+        </Link>
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -116,6 +123,4 @@ const AdminPage = () => {
       </div>
     </div>
   );
-};
-
-export default AdminPage;
+}
